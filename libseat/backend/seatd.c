@@ -629,6 +629,7 @@ static int disable_seat(struct libseat *base) {
 
 const struct seat_impl seatd_impl = {
 	.open_seat = open_seat,
+	.open_seat_via_fd = _open_seat,
 	.disable_seat = disable_seat,
 	.close_seat = close_seat,
 	.seat_name = seat_name,

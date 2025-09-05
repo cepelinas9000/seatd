@@ -27,6 +27,9 @@ struct seat_impl {
 
 	int (*get_fd)(struct libseat *seat);
 	int (*dispatch)(struct libseat *seat, int timeout);
+
+	struct libseat *(*open_seat_via_fd)(const struct libseat_seat_listener *listener,  void *data, int socket_fd);
+
 };
 
 #endif

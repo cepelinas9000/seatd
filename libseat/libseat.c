@@ -34,6 +34,43 @@ static const struct named_backend impls[] = {
 #error At least one backend must be enabled
 #endif
 
+struct libseat *libseat_open_seat_fd(const struct libseat_seat_listener *listener, void *userdata, const char* restrict backend_type, int fd){
+
+	if (listener == NULL || listener->enable_seat == NULL || listener->disable_seat == NULL) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	log_init();
+
+	const struct named_backend *iter = impls;
+	while (iter->backend != NULL && strcmp(backend_type, iter->name) != 0) {
+		iter++;
+	}
+	if (iter == NULL || iter->backend == NULL) {
+		log_errorf("No backend matched name '%s'", backend_type);
+		errno = EINVAL;
+		return NULL;
+	}
+
+	if (iter->backend->open_seat_via_fd == NULL){
+		log_errorf("Backed '%s' doesn't not support open by file descriptor",iter->name);
+		errno = EINVAL;
+		return NULL;
+	}
+
+	struct libseat *backend = iter->backend->open_seat_via_fd(listener, userdata, fd);
+	if (backend == NULL) {
+		log_errorf("Backend '%s' failed to open seat: %s", iter->name,
+			   strerror(errno));
+		return NULL;
+	}
+
+	log_infof("Seat opened with backend '%s' using fd=%d", iter->name, fd);
+	return backend;
+
+}
+
 struct libseat *libseat_open_seat(const struct libseat_seat_listener *listener, void *data) {
 	if (listener == NULL || listener->enable_seat == NULL || listener->disable_seat == NULL) {
 		errno = EINVAL;

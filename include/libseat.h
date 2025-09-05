@@ -59,6 +59,12 @@ struct libseat_seat_listener {
  */
 struct libseat *libseat_open_seat(const struct libseat_seat_listener *listener, void *userdata);
 
+/* Opens a seat similar as libseat_open_seat, but requires already connected socket
+ * and known backed.
+ * other behaviour exactly as libseat_open_seat
+*/
+struct libseat *libseat_open_seat_fd(const struct libseat_seat_listener *listener, void *userdata, const char* restrict backend_type, int fd);
+
 /*
  * Disables a seat, used in response to a disable_seat event. After disabling
  * the seat, the seat devices must not be used until enable_seat is received,
